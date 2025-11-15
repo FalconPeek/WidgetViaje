@@ -1,0 +1,34 @@
+# Project: Widget Viaje
+# Makefile created by Dev-C++ 5.5.3
+
+CPP      = g++.exe -D__DEBUG__
+CC       = gcc.exe -D__DEBUG__
+WINDRES  = windres.exe
+OBJ      = src/tda.o src/net.o src/main.o
+LINKOBJ  = src/tda.o src/net.o src/main.o
+LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc -mwindows -lwininet -lshell32  -pg -g3
+INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include"
+CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.7.1/include/c++"
+BIN      = "Widget Viaje.exe"
+CXXFLAGS = $(CXXINCS) -pg -g3 -I./dat -I./archivos
+CFLAGS   = $(INCS) -pg -g3 -I./dat -I./archivos
+RM       = rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+src/tda.o: src/tda.c
+	$(CC) -c src/tda.c -o src/tda.o $(CFLAGS)
+
+src/net.o: src/net.c
+	$(CC) -c src/net.c -o src/net.o $(CFLAGS)
+
+src/main.o: src/main.c
+	$(CC) -c src/main.c -o src/main.o $(CFLAGS)

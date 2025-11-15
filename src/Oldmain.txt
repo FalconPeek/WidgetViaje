@@ -1,0 +1,106 @@
+#include <windows.h>
+#include <string.h>
+#include <stdio.h> /* Usando para el printf*/
+#include "tda.h"
+#include "net.h"
+
+/* This is where all the input to the window goes to */
+#include "ui.h"
+
+
+
+/* The 'main' function of Win32 GUI programs: this is where execution starts */
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    WNDCLASSEX wc;
+    HWND hwnd;
+    MSG Msg;
+    
+    
+    const char *URL_PRECIOS = "https://miMiniWeb/precios.txt";
+
+    // Intentar descargar archivo remoto
+    if (!descargarArchivoPrecios(URL_PRECIOS)) {
+        // Si falla la descarga, seguimos con el archivo local o el fallback
+        // Pod�s loguear algo o mostrar un MessageBox si quer�s.
+        MessageBox(NULL, "No se pudo descargar precios online", "Aviso", MB_OK);
+    }
+
+    // Cargar estaciones desde archivo (el remoto si se descarg� bien)
+    if (cargarEstacionesDesdeArchivo("precios.txt") == 0) {
+        // Fallback si no existe el archivo o est� vac�o
+        estacionesCount = 3;
+
+        strcpy(estaciones[0].nombre, "YPF");
+        estaciones[0].precio = 1234.50;
+
+        strcpy(estaciones[1].nombre, "Shell");
+        estaciones[1].precio = 1240.00;
+
+        strcpy(estaciones[2].nombre, "AXION");
+        estaciones[2].precio = 1220.75;
+    } 
+    
+    
+    // Cargar estaciones desde archivo
+if (cargarEstacionesDesdeArchivo("precios.txt") == 0) {
+    // Fallback si no existe el archivo: valores por defecto
+    estacionesCount = 3;
+
+    strcpy(estaciones[0].nombre, "YPF");
+    estaciones[0].precio = 1234.50;
+
+    strcpy(estaciones[1].nombre, "Shell");
+    estaciones[1].precio = 1240.00;
+
+    strcpy(estaciones[2].nombre, "AXION");
+    estaciones[2].precio = 1220.75;
+}
+
+    memset(&wc, 0, sizeof(wc));
+    wc.cbSize        = sizeof(WNDCLASSEX);
+    wc.lpfnWndProc   = WndProc;
+    wc.hInstance     = hInstance;
+    wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+    wc.lpszClassName = "FuelWidgetClass";
+    wc.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+    wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);
+
+    if(!RegisterClassEx(&wc)) {
+        MessageBox(NULL, "Window Registration Failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
+        return 0;
+    }
+
+    int width  = 350;
+    int height = 230;
+
+    // Posicionar en esquina superior derecha
+    int screenW = GetSystemMetrics(SM_CXSCREEN);
+    int screenH = GetSystemMetrics(SM_CYSCREEN);
+    int x = screenW - width - 20;  // margen derecha
+    int y = 20;                    // margen superior
+
+    hwnd = CreateWindowEx(
+        WS_EX_TOPMOST | WS_EX_TOOLWINDOW,   // siempre arriba, sin �cono en la barra de tareas
+        "FuelWidgetClass",
+        NULL,                               // sin t�tulo visible
+        WS_POPUP,                           // ventana sin bordes
+        x, y, width, height,
+        NULL, NULL, hInstance, NULL
+    );
+
+    if (hwnd == NULL) {
+        MessageBox(NULL, "Window Creation Failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
+        return 0;
+    }
+
+    ShowWindow(hwnd, nCmdShow);
+    UpdateWindow(hwnd);
+
+    while (GetMessage(&Msg, NULL, 0, 0) > 0) {
+        TranslateMessage(&Msg);
+        DispatchMessage(&Msg);
+    }
+    return Msg.wParam;
+}
+
